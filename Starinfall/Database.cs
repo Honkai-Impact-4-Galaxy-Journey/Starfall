@@ -1,4 +1,5 @@
-﻿using MySql.Data.MySqlClient;
+﻿using InventorySystem.Items.Coin;
+using MySql.Data.MySqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,10 +33,10 @@ namespace Starinfall
     public class ConnectionPool
     {
         private static Queue<MySqlConnection> mySqls = new Queue<MySqlConnection>();
-        public const int InitCounts = 3;
+        public const int MinCounts = 2;
         public static void InitConnectionPool()
         {
-            for(int i = 0; i < InitCounts; ++i)
+            for(int i = 0; i < MinCounts; ++i)
             {
                 MySqlConnection mySqlConnection = new MySqlConnection(PluginMain.Instance.Config.ConnectionString);
                 mySqlConnection.Open();
@@ -44,7 +45,27 @@ namespace Starinfall
         }
         public static MySqlConnection GetConnection()
         {
-            
+            lock (mySqls)
+            {
+                if (mySqls.Count > 0)
+                {
+
+                }
+            }
+        }
+        private static bool IsUseful(MySqlConnection connection)
+        {
+            bool result = true;
+            try
+            {
+                MySqlCommand command = new MySqlCommand("select 1", connection);
+                command.ExecuteScalar().ToString();
+            }
+            catch
+            {
+                result = false;
+            }
+            return result;
         }
     }
 }
